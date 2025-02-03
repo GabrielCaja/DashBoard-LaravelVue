@@ -1,4 +1,17 @@
 <template>
+    <!-- Formulario para agregar un nuevo producto -->
+    <div class="form-container">
+        <h3>Agregar Producto</h3>
+        <form @submit.prevent="agregarProducto">
+            <label>Nombre:</label>
+            <input v-model="nuevoProducto.title" type="text" required />
+            <label>Precio:</label>
+            <input v-model="nuevoProducto.price" type="number" required />
+            <label>Descripción:</label>
+            <textarea v-model="nuevoProducto.description" required></textarea>
+            <button type="submit">Agregar</button>
+        </form>
+    </div>
     <!-- Tabla de productos -->
     <table>
         <thead>
@@ -129,6 +142,18 @@ export default {
                 } catch (error) {
                     console.error("Error al eliminar el producto:", error);
                 }
+            }
+        },
+        async agregarProducto() {
+            try {
+                const response = await axios.post(
+                    "/api/products",
+                    this.nuevoProducto
+                );
+                this.productos.push(response.data);
+                this.nuevoProducto = { title: "", price: "", description: "" };
+            } catch (error) {
+                console.error("Error al agregar producto:", error);
             }
         },
         async guardarEdicion() {

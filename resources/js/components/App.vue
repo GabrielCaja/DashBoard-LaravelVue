@@ -86,6 +86,11 @@ export default {
             productos: [],
             productoSeleccionado: null,
             productoEditando: null,
+            nuevoProducto: {
+                title: "",
+                price: "",
+                description: "",
+            },
         };
     },
     mounted() {
@@ -112,13 +117,27 @@ export default {
         cerrarModalEdicion() {
             this.productoEditando = null;
         },
+        async eliminarProducto(id) {
+            if (
+                confirm("¿Estás seguro de que quieres eliminar este producto?")
+            ) {
+                try {
+                    await axios.delete(`/api/products/${id}`);
+                    this.productos = this.productos.filter(
+                        (producto) => producto.id !== id
+                    );
+                } catch (error) {
+                    console.error("Error al eliminar el producto:", error);
+                }
+            }
+        },
         async guardarEdicion() {
             try {
                 await axios.put(
                     `/api/products/${this.productoEditando.id}`,
                     this.productoEditando
                 );
-                
+
                 const index = this.productos.findIndex(
                     (p) => p.id === this.productoEditando.id
                 );

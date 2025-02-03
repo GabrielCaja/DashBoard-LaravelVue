@@ -63,6 +63,7 @@
                 <input
                     v-model="productoEditando.price"
                     type="number"
+                    step="0.01"
                     required
                 />
                 <label>Descripción:</label>
@@ -108,14 +109,16 @@ export default {
         editarProducto(producto) {
             this.productoEditando = { ...producto }; // Clonamos el objeto para evitar modificaciones en la tabla
         },
+        cerrarModalEdicion() {
+            this.productoEditando = null;
+        },
         async guardarEdicion() {
             try {
                 await axios.put(
-                    "/api/producto/${this.productoEditando.id}",
+                    `/api/products/${this.productoEditando.id}`,
                     this.productoEditando
                 );
-                // Actualizar la lista de productos con los nuevos
-                datos;
+                
                 const index = this.productos.findIndex(
                     (p) => p.id === this.productoEditando.id
                 );

@@ -37,6 +37,43 @@
             </tr>
         </tbody>
     </table>
+    <!-- Modal de detalles del producto -->
+    <div v-if="productoSeleccionado" class="modal">
+        <div class="modal-content">
+            <span class="close" @click="cerrarModal">&times;</span>
+            <h3>Detalles del Producto</h3>
+            <p><strong>ID:</strong> {{ productoSeleccionado.id }}</p>
+            <p><strong>Nombre:</strong> {{ productoSeleccionado.title }}</p>
+            <p><strong>Precio:</strong> ${{ productoSeleccionado.price }}</p>
+            <p>
+                <strong>Descripción:</strong>
+                {{ productoSeleccionado.description }}
+            </p>
+        </div>
+    </div>
+    <!-- Modal de edición de producto -->
+    <div v-if="productoEditando" class="modal">
+        <div class="modal-content">
+            <span class="close" @click="cerrarModalEdicion">&times;</span>
+            <h3>Editar Producto</h3>
+            <form @submit.prevent="guardarEdicion">
+                <label>Nombre:</label>
+                <input v-model="productoEditando.title" type="text" required />
+                <label>Precio:</label>
+                <input
+                    v-model="productoEditando.price"
+                    type="number"
+                    required
+                />
+                <label>Descripción:</label>
+                <textarea
+                    v-model="productoEditando.description"
+                    required
+                ></textarea>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -46,6 +83,8 @@ export default {
         return {
             texto: "Hola Mundo",
             productos: [],
+            productoSeleccionado: null,
+            productoEditando: null,
         };
     },
     mounted() {
@@ -58,6 +97,36 @@ export default {
                 this.productos = response.data;
             } catch (error) {
                 console.error(error);
+            }
+        },
+        verProducto(producto) {
+            this.productoSeleccionado = producto;
+        },
+        cerrarModal() {
+            this.productoSeleccionado = null;
+        },
+        editarProducto(producto) {
+            this.productoEditando = { ...producto }; // Clonamos el objeto para evitar modificaciones en la tabla
+        },
+        async guardarEdicion() {
+            try {
+                await axios.put(
+                    "/api/producto/${this.productoEditando.id}",
+                    this.productoEditando
+                );
+                // Actualizar la lista de productos con los nuevos
+                datos;
+                const index = this.productos.findIndex(
+                    (p) => p.id === this.productoEditando.id
+                );
+                if (index !== -1) {
+                    this.productos[index] = {
+                        ...this.productoEditando,
+                    };
+                }
+                this.cerrarModalEdicion();
+            } catch (error) {
+                console.error("Error al actualizar el producto:", error);
             }
         },
     },
